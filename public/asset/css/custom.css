@@ -1,0 +1,78 @@
+.theme-bg{
+    /*background-color: #106894 !important;*/
+    background-color: #023047 !important;
+}
+/*.main-sidebar .nav-link.active {*/
+/*    background-color: #5497b3 !important;*/
+/*}*/
+.vBtn{
+    color: white;
+    background-color: #106894 !important;
+}
+.vBtn:hover{
+    color: white;
+    background-color: #106894 !important;
+}
+.defaultBtn{
+    color: white;
+    background-color: #106894 !important;
+}
+.vMHeader{
+    background-color: #106894 !important;
+}
+.vMHeader .close, .vDMHeader .card-tools i {
+    color: #fff;
+    opacity: 1;
+}
+.error {
+    color: red;
+    font-size: 14px;
+    font-weight: 400 !important;
+    float: right;
+}
+.form-control.error{
+    border-color: red;
+}
+.circle-avatar {
+    max-height: 50px;
+    max-width: 50px;
+    border-radius: 100%;
+}
+.circle-avatar-preview {
+    max-height: 150px;
+    max-width: 150px;
+    border-radius: 100%;
+}
+.vBadge .badge {
+    width: 100%;
+    /* max-width: 150px; */
+    font-size: 14px;
+    font-weight: 400;
+    padding: 5px 15px;
+    border-radius: 2px;
+}
+
+.navbar-white {
+    background-color: #06364e;
+}
+.navbar-light .navbar-nav .nav-link {
+    color: #f8f9fa;
+}
+
+.profile-avatar-replace-style {
+    height: 50px;
+    width: 50px;
+}
+.profile-avatar-replace {
+    position: absolute;
+    left: 0;
+    top: 32px;
+    cursor: pointer;
+}
+.mandatory:after {
+    content: " *";
+    color: red;
+}
+.form-control[readonly]{
+    background-color: white !important;
+}
