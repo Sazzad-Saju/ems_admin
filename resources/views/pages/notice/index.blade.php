@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', trans('trans.department'))
+@section('title', 'Notice')
 {{--@push('push-style')--}}
 
 {{--@endpush--}}
@@ -9,12 +9,12 @@
         <div class="container-fluid">
             <div class="row no-gutters mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">@lang('trans.department')</h1>
+                    <h1 class="m-0 text-dark">Notice</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{url('/home')}}">@lang('trans.home')</a></li>
-                        <li class="breadcrumb-item active">@lang('trans.department')</li>
+                        <li class="breadcrumb-item active">Notice</li>
                     </ol>
                 </div>
             </div>
@@ -26,73 +26,51 @@
             <div class="col-12">
                 <div class="card vCard">
                     <div class="card-header">
-                        <h3 class="card-title">@lang('trans.department')</h3>
+                        <h3 class="card-title">Notice</h3>
                         <button type="button" class="btn btn-sm vBtn float-right" data-toggle="modal"
-                                data-target="#departmentRegisterModal"><i class="fa fa-plus"></i>
+                                data-target="#NewNoticeModal"><i class="fa fa-plus"></i>
                             @lang('trans.add_new')
                         </button>
                     </div>
                     <div class="card-body">
-                        <table id="departmentDataTable"
-                               class="table table-bordered table-striped dataTable dtr-inline text-center">
+                        <table id="noticeDataTable"
+                               class="table table-bordered table-striped dataTable dtr-inline">
                             <thead>
-                            <tr>
+                            <tr class="text-center">
                                 <th>SL</th>
-                                <th>Department Name</th>
-                                <th>Department head</th>
-                                <th>Parent Department</th>
-                                <th>Status</th>
+                                <th>Message</th>
+                                <th>Created at</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($departments as $department)
+                            @foreach($notices as $notice)
                                 <tr>
                                     <th>{{$loop->index+1}}</th>
-                                    <td>{{$department->name}}</td>
-                                    <td>{{isset($department->head->name)? $department->head->name : '---'}}</td>
-                                    <td>{{isset($department->parentDepartment->name)? $department->parentDepartment->name : '---'}}</td>
-                                    <td>
-                                        <a href="javascript:void(0)"
-                                           class="badge {{$department->status == 1 ? 'badge-success' : 'badge-danger'}}"
-
-                                           onclick="departmentStatusChange({{json_encode($department->id)}})"
-                                           data-toggle="tooltip"
-                                           title="Click to change status"
-
-                                           id="department_status_{{$department->id}}"
-                                           data-href="{{route('departments.status', $department->id)}}"
-                                        >
-                                            @if($department->status == 1)
-                                                <i class="fa fa-check"></i>
-                                            @else
-                                                <i class="fa fa-power-off"></i>
-                                            @endif
-                                        </a>
-                                    </td>
+                                    <td>{!!$notice->message!!}</td>
+                                    <td>{{$notice->created_at->format('d/m/Y')}}</td>
                                     <td>
 
-                                        <button onclick="getDepartmentShowInfo({{$department->id}})"
+                                        <button onclick="getNoticeShowInfo({{$notice->id}})"
 
                                                 class="btn btn-sm btn-info" data-toggle="tooltip"
                                                 title="Show details"><i class="fa fa-search-plus"></i>
                                         </button>
 
 
-                                        <button onclick="getDepartmentEditInfo({{$department->id}})"
+                                        <button onclick="getNoticeEditInfo({{$notice->id}})"
 
                                                 class="btn btn-sm btn-secondary" data-toggle="tooltip"
-                                                title="Edit department"><i class="fa fa-edit"></i>
+                                                title="Edit notice"><i class="fa fa-edit"></i>
                                         </button>
 
-
-                                        <form action="{{route('departments.destroy', $department->id)}}"
-                                              method="post" id="delete_department_{{$department->id}}" class="d-inline">
+                                        <form action="{{route('notices.destroy', $notice->id)}}"
+                                              method="post" id="delete_notice_{{$notice->id}}" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button onclick="deleteDepartment({{json_encode($department->id)}}, event)"
+                                            <button onclick="deleteNotice({{json_encode($notice->id)}}, event)"
                                                     class="btn btn-sm btn-danger" data-toggle="tooltip"
-                                                    title="Delete department"><i class="fa fa-trash"></i>
+                                                    title="Delete notice"><i class="fa fa-trash"></i>
                                             </button>
                                         </form>
                                     </td>
@@ -104,11 +82,13 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="departmentShowModal">
+
+        {{-- Notice Show Modal --}}
+        <div class="modal fade" id="noticeShowModal">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header vMHeader">
-                        <h4 class="modal-title text-white">@lang('trans.department_information')</h4>
+                        <h4 class="modal-title text-white">Notice Details</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -118,21 +98,13 @@
                         <table class="table table-hover">
                             <tbody>
                             <tr>
-                                <th>Department Name:</th>
-                                <td id="show_department_name"></td>
+                                <th>Message:</th>
+                                <td id="show_notice_message"></td>
                             </tr>
 
                             <tr>
-                                <th>Department Head:</th>
-                                <td id="show_department_head_id"></td>
-                            </tr>
-                            <tr>
-                                <th>Parent Department :</th>
-                                <td id="show_parent_department_id"></td>
-                            </tr>
-                            <tr>
-                                <th>Status:</th>
-                                <td class="vBadge" id="show_status"></td>
+                                <th>Created At:</th>
+                                <td id="show_notice_created_at"></td>
                             </tr>
 
                             </tbody>
@@ -147,18 +119,19 @@
             </div>
         </div>
 
-        <div class="modal fade" id="departmentRegisterModal">
+        {{-- Create Notice Modal --}}
+        <div class="modal fade" id="NewNoticeModal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header vMHeader">
-                        <h4 class="modal-title text-white">@lang('trans.create_new_department')</h4>
+                        <h4 class="modal-title text-white">Create New Notice</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
 
                     <!-- form start -->
-                    <form role="form" id="departmentRegisterForm" action="{{route('departments.store')}}"
+                    <form role="form" id="noticeRegisterForm" action="{{route('notices.store')}}"
                           method="post">
                         @csrf
                         <div class="modal-body">
@@ -166,20 +139,23 @@
                                 <div class="col-sm-12">
                                     <!-- text input -->
                                     <div class="form-group">
-                                        <label for="name"  class="mandatory">Department Name</label>
-                                        <input type="text"
-                                               class="form-control @error('name') is-invalid @enderror"
-                                               placeholder="Enter Department name"
-                                               name="name" id="name"
-                                               value="{{old('name')}}">
-                                        @error('name') <span
-                                            class="text-danger float-right">{{$errors->first('name') }}</span> @enderror
-                                        <span class="text-danger float-right" id="departmentTimeError"
-                                              style="display: none"></span>
+                                        <label for="message"  class="mandatory">Notice Message</label>
+                                        <textarea type="text" rows="5"
+                                               class="form-control @error('message') is-invalid @enderror"
+                                               placeholder="Enter Notice Message"
+                                               name="message" id="enterNotice"> {{old('message')}} </textarea>
+                                        @error('message')
+                                            <span class="text-danger float-right">{{$errors->first('message') }}</span>
+                                        @enderror
                                     </div>
                                 </div>
-
-
+                                <div class="col-sm-12">
+                                    <!-- text input -->
+                                    <div class="form-group">
+                                        <label for="employee_id">Created At</label>
+                                        <input class="ml-2" type="date" name="updated_at" value="{{$date->format('Y-m-d')}}" disabled>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <!--/.modal-body-->
@@ -190,24 +166,25 @@
                             </button>
                             <button type="submit"
                                     class="btn btn-sm defaultBtn float-right"
-                                    id="createDepartmentBtn">@lang('trans.create')</button>
+                                    id="createNoticeBtn">@lang('trans.create')</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <div class="modal fade" id="departmentEditModal">
+        {{-- Notice Edit Modal --}}
+        <div class="modal fade" id="noticeEditModal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header vMHeader">
-                        <h4 class="modal-title text-white">@lang('trans.edit_department')</h4>
+                        <h4 class="modal-title text-white">Edit Notice</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <!-- form start -->
-                    <form role="form" id="departmentEditForm" action=""
+                    <form role="form" id="noticeEditForm" action=""
                           method="post">
                         @csrf
                         @method('put')
@@ -216,45 +193,21 @@
                                 <div class="col-sm-12">
                                     <!-- text input -->
                                     <div class="form-group">
-                                        <label for="name" class="mandatory">Department Name</label>
-                                        <input type="text"
-                                               class="form-control @error('name') is-invalid @enderror"
-                                               placeholder="Enter start date"
-                                               name="name" id="edit_name"
-                                               value="{{old('name')}}">
-                                        @error('name') <span
-                                            class="text-danger float-right">{{$errors->first('name') }}</span> @enderror
+                                        <label for="message" class="mandatory">Notice Message</label>
+                                        <textarea type="text"
+                                               class="form-control @error('message') is-invalid @enderror"
+                                               placeholder="Notice Message"
+                                               name="message" id="edit_message" rows="5"> {{old('message')}} </textarea>
+                                        @error('message') <span
+                                            class="text-danger float-right">{{$errors->first('message') }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <!-- text input -->
                                     <div class="form-group">
-                                        <label for="employee_id">Department Head</label>
-                                        <select class="form-control" name="employee_id" id="edit_employee_id">
-                                            <option value="">Choose Department head</option>
-                                            @foreach($employees as $employee)
-                                                <option value="{{$employee->id}}"
-                                                        @if(old('employee_id') == $employee->id) selected @endif>{{$employee->name}}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('employee_id') <span
-                                            class="text-danger float-right">{{$errors->first('employee_id') }}</span> @enderror
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <!-- text input -->
-                                    <div class="form-group">
-                                        <label for="parent_department_id">Parent Department</label>
-                                        <select class="form-control" name="parent_department_id"
-                                                id="edit_parent_department_id">
-                                            <option value="">Choose Parent Department</option>
-                                            @foreach($departments as $department)
-                                                <option value="{{$department->id}}"
-                                                        @if(old('parent_department_id') == $department->id) selected @endif>{{$department->name}}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('parent_department_id') <span
-                                            class="text-danger float-right">{{$errors->first('parent_department_id') }}</span> @enderror
+                                        <label for="employee_id">Updated At</label>
+                                        <input class="ml-2" type="date" name="updated_at" value="{{$date->format('Y-m-d')}}" disabled>
                                     </div>
                                 </div>
                             </div>
@@ -265,7 +218,7 @@
                             </button>
                             <button type="submit"
                                     class="btn btn-sm defaultBtn float-right"
-                                    id="editDepartmentBtn">@lang('trans.update')</button>
+                                    id="editNoticeBtn">@lang('trans.update')</button>
                         </div>
                     </form>
                 </div>
@@ -273,23 +226,38 @@
             </div>
 
         </div>
+        <div class="d-flex justify-content-center">
+            {{$notices->links()}}
+        </div>
     </section>
 
 
 @endsection
 
+@section('ckeditor')
+<script>
+    ClassicEditor
+        .create( document.querySelector( '#enterNotice' ) )
+        .catch( error => {
+            console.error( error );
+        } );
+    // document.getElementById("edit_message").value = "<p>Some other editor data.</p>";
+    // CKEDITOR.replace("edit_message");
+
+</script>
+@endsection
 
 @push('js')
 
     <script>
-        let departments = @json($departments);
+        let notices = @json($notice);
 
         $(document).ready(function () {
 
-            $('#totalDepartmentTable').click();
-            $('#createTotalDepartmentCollapse').click();
+            $('#totalNoticeTable').click();
+            $('#createTotalNoticeCollapse').click();
 
-            $('#departmentDataTable').DataTable({
+            $('#noticeDataTable').DataTable({
                 "responsive": true,
                 "autoWidth": false,
 
@@ -299,33 +267,22 @@
                 "pageLength": {{settings('per_page')}}
             });
 
-            $('#departmentRegisterForm').validate({
+            $('#noticeRegisterForm').validate({
                 rules: {
-                    name: {
+                    message: {
                         required: true,
-                        maxlength: 30,
                     },
 
-                },
-                messages: {
-                    name: {
-                        required: 'Department name is required',
-                    },
                 },
 
             });
 
-            $('#departmentEditForm').validate({
+            $('#noticeEditForm').validate({
                 rules: {
-                    name: {
+                    message: {
                         required: true,
                     },
 
-                },
-                messages: {
-                    name: {
-                        required: 'Department name is required',
-                    },
                 },
 
             });
@@ -333,7 +290,7 @@
         });
 
 
-        function deleteDepartment(department_id, e) {
+        function deleteNotice(notice_id, e) {
             e.preventDefault()
             Swal.fire({
                 title: 'Are you sure?',
@@ -346,78 +303,50 @@
             }).then((result) => {
                 if (result.value == true) {
 
-                    $('#delete_department_' + department_id).submit();
+                    $('#delete_notice_' + notice_id).submit();
 
                 }
             })
         }
 
 
-        function getDepartmentShowInfo(id) {
+        function getNoticeShowInfo(id) {
 
-            let departments = @json($departments);
-            let department = departments.find(x => x.id === id);
+            // console.log(id);
+            let notices = @json($notices);
+            let notice = notices.find(x => x.id === id);
+            $('#show_notice_message').html(notice.message)
+            let date = new Date(notice.created_at);
+            // console.log(date.getMonth()+1)
+            formattedDate = date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
+            // console.log(formattedDate );
+            // console.log(String(date.getDate()).padStart(2, '0'))
+            // console.log(date);
+            $('#show_notice_created_at').html(formattedDate)
 
-            $('#show_department_name').html(department.name)
-            $('#show_department_head_id').html(department.head ? department.head.name : '---')
-            $('#show_parent_department_id').html(department.parent_department ? department.parent_department.name : '---')
 
 
-            $('#show_status').html("");
-            if (department.status == 1) {
-                $('#show_status').append("<span class='badge badge-success'>Active</span>");
-            } else {
-                $('#show_status').append("<span class='badge badge-danger'>Inactive</span>");
-            }
 
-            $('#departmentShowModal').modal('show')
+
+            $('#noticeShowModal').modal('show')
         }
 
 
-        function getDepartmentEditInfo(id) {
+        function getNoticeEditInfo(id) {
 
-            let departments = @json($departments);
-            let department = departments.find(x => x.id === id);
+            let notices = @json($notices);
+            let notice = notices.find(x => x.id === id);
+            // console.log(notice);
 
-            /* Set Edit Department form action */
+            /* Set Edit Notice form action */
             const appUrl = $('meta[name="app-url"]').attr('content');
-            $('#departmentEditForm').attr('action', appUrl + '/departments/' + department.id)
+            $('#noticeEditForm').attr('action', appUrl + '/notices/' + notice.id)
 
-            $('#edit_name').val(department.name)
+            $('#edit_message').val(notice.message)
 
-            if (department.head) {
-                $('#edit_employee_id option[value="' + department.head.id + '"]').prop("selected", true)
-            }
-            if (department.parent_department) {
-                $('#edit_parent_department_id option[value="' + department.parent_department.id + '"]').prop("selected", true)
-            }
+            $('#noticeEditModal').modal('show')
 
 
-            $('#departmentEditModal').modal('show')
-
-
-        }
-
-        function departmentStatusChange(department_id) {
-            let departments = @json($departments);
-            let department = departments.find(x => x.id === department_id);
-            if (department.status == 1) {
-                var action = "deactivate"
-            } else {
-                var action = "activate"
-            }
-            Swal.fire({
-                title: 'Are you sure to ' + action + '?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, ' + action
-            }).then((result) => {
-                if (result.value) {
-                    window.location.href = $('#department_status_' + department_id).data('href');
-                }
-            })
         }
 
 

@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Notice;
+use App\Models\Department;
 use App\Notifications\NotifyNotice;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Mockery\Matcher\Not;
 
 class NoticeController extends Controller
 {
@@ -16,7 +19,10 @@ class NoticeController extends Controller
      */
     public function index()
     {
-        return view('pages.notice.index');
+        $notices = Notice::select(['id','message','created_at'])->orderBy('created_at','desc')->paginate(5);
+        $date = Carbon::now();
+        // return $notices;
+        return view('pages.notice.index',compact('notices','date'));
         return view('pages.notice.notice');
     }
 
@@ -40,14 +46,18 @@ class NoticeController extends Controller
     {
         // return $request->all();
         //// Employee::find(Auth('employee')->user()->id)->notify(new LatestNotice);
-        $data = $request->except('_token');
+        $request->validate(['message' => 'required']);
+        $data = $request->only(['message']);
+        $today = Carbon::now('Asia/Dhaka')->toDateTimeString();
+        $data['created_at'] = $today;
+        $data['created_by'] = 1;
         $notice = Notice::create($data);
 
         $employees = Employee::all();
         foreach($employees as $employee){
             $employee->notify(new NotifyNotice($notice->message));
         }
-        return $data;
+        return redirect()->back()->with('success', trans('trans.create_successfully'));
     }
 
     /**
@@ -81,7 +91,13 @@ class NoticeController extends Controller
      */
     public function update(Request $request, Notice $notice)
     {
-        //
+        $data = $request->only(['message']);
+        $today = Carbon::now('Asia/Dhaka')->toDateTimeString();
+        $data['updated_at'] = $today;
+        $data['updated_by'] = 1;
+        $notice->update($data);
+        return redirect()->back()->with('success', trans('trans.update_successfully'));
+        // return $data;
     }
 
     /**
@@ -92,6 +108,8 @@ class NoticeController extends Controller
      */
     public function destroy(Notice $notice)
     {
-        //
+        $notice->delete();
+
+        return redirect()->back()->with('success', trans('trans.delete_successfully'));
     }
 }

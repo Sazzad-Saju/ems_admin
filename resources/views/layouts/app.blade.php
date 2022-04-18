@@ -30,5 +30,7 @@
     </div>
 
 @include('includes.scripts')
+{{-- linked ckeditor to use on any page --}}
+@yield('ckeditor')
 </body>
 </html>
