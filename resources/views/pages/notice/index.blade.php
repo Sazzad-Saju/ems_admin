@@ -250,45 +250,6 @@
 @push('js')
 
     <script>
-        let notices = @json($notice);
-
-        $(document).ready(function () {
-
-            $('#totalNoticeTable').click();
-            $('#createTotalNoticeCollapse').click();
-
-            $('#noticeDataTable').DataTable({
-                "responsive": true,
-                "autoWidth": false,
-
-                "columnDefs": [
-                    {"orderable": false, "targets": [5]}
-                ],
-                "pageLength": {{settings('per_page')}}
-            });
-
-            $('#noticeRegisterForm').validate({
-                rules: {
-                    message: {
-                        required: true,
-                    },
-
-                },
-
-            });
-
-            $('#noticeEditForm').validate({
-                rules: {
-                    message: {
-                        required: true,
-                    },
-
-                },
-
-            });
-
-        });
-
 
         function deleteNotice(notice_id, e) {
             e.preventDefault()

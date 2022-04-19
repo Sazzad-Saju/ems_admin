@@ -7,6 +7,7 @@ use App\Models\Notice;
 use App\Models\Department;
 use App\Notifications\NotifyNotice;
 use Carbon\Carbon;
+use Google\Service\AlertCenter\Notification;
 use Illuminate\Http\Request;
 use Mockery\Matcher\Not;
 
@@ -108,8 +109,15 @@ class NoticeController extends Controller
      */
     public function destroy(Notice $notice)
     {
-        $notice->delete();
+        // This delete data of all employee from notification table for that notice
+        $message =  $notice['message'];
+        $employees = Employee::all();
+        foreach($employees as $employee){
+            $employee->notifications()->where('data->data', $message)->delete();
+        }
 
+        // delete notice
+        $notice->delete();
         return redirect()->back()->with('success', trans('trans.delete_successfully'));
     }
 }
