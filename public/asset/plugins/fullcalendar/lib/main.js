@@ -66,7 +66,7 @@ var FullCalendar = (function (exports) {
 
     var globalObj = typeof globalThis !== 'undefined' ? globalThis : window; // // TODO: streamline when killing IE11 support
     if (globalObj.FullCalendarVDom) {
-        console.warn('FullCalendar VDOM already loaded');
+        // console.warn('FullCalendar VDOM already loaded');
     }
     else {
         globalObj.FullCalendarVDom = {

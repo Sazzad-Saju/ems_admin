@@ -140,9 +140,6 @@
 
 {{-- ckeditor --}}
 <script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script>
-<script type="text/javascript">
-    editor.resize( '100%', '350', true );
-</script>
 
 @stack('js')
 

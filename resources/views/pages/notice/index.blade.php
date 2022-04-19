@@ -274,7 +274,8 @@
         function getNoticeShowInfo(id) {
 
             // console.log(id);
-            let notices = @json($notices);
+            let notices = @json($notices).data;
+            // console.log(notices.data)
             let notice = notices.find(x => x.id === id);
             $('#show_notice_message').html(notice.message)
             let date = new Date(notice.created_at);
@@ -295,7 +296,7 @@
 
         function getNoticeEditInfo(id) {
 
-            let notices = @json($notices);
+            let notices = @json($notices).data;
             let notice = notices.find(x => x.id === id);
             // console.log(notice);
 
